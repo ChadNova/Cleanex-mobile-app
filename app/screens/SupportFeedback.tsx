@@ -242,7 +242,7 @@ export default function SupportFeedbackScreen() {
                   Phone Support
                 </Text>
                 <Text className={`font-inter text-sm ${isDarkMode ? 'text-gray-400' : 'text-text-secondary'}`}>
-                  +250 788 123 456
+                  +250 796 582 447
                 </Text>
               </View>
               <ExternalLink color={isDarkMode ? '#9CA3AF' : '#6B7280'} size={16} />
