@@ -328,7 +328,7 @@ const pickImage = async () => {
               {editedUser.full_name || editedUser.name || 'Student'}
             </Text>
             <Text className={`font-inter text-lg ${isDarkMode ? 'text-gray-300' : 'text-text-secondary'}`}>
-              CleanEx Student
+              CleanEx User
             </Text>
             <View className="bg-green-100 px-4 py-2 rounded-full mt-2">
               <Text className="text-green-800 font-inter-bold text-sm">Active Member</Text>
