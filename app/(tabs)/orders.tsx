@@ -270,19 +270,19 @@ export default function OrdersScreen() {
                   <View className={`rounded-2xl p-4 mb-4 ${isDarkMode ? "bg-secondary/20" : "bg-secondary/10"}`}>
                     <View className="flex-row justify-between items-center mb-2">
                       <Text className="text-secondary font-inter-bold">USSD Payment Code</Text>
-                      <TouchableOpacity onPress={() => copyToClipboard("*182*1*1*0791433501#")} className="flex-row items-center">
+                      <TouchableOpacity onPress={() => copyToClipboard("*182*1*1*001203#")} className="flex-row items-center">
                         <Copy color="#10B981" size={16} />
                         <Text className="text-secondary font-inter ml-1">Copy</Text>
                       </TouchableOpacity>
                     </View>
-                    <Text className="text-secondary font-inter-bold text-xl">{"*182*1*1*0791433501#"}</Text>
+                    <Text className="text-secondary font-inter-bold text-xl">{"*182*1*1*001203#"}</Text>
                   </View>
                   
                   <View className={`rounded-2xl p-4 ${isDarkMode ? "bg-accent/20" : "bg-accent/10"}`}>
                     <Text className="text-accent font-inter-bold mb-2">Payment proof</Text>
                     <View className="flex-row justify-between items-center">
-                      <Text className="text-accent font-inter-bold text-lg">{"ssossinfo88@gmail.com"}</Text>
-                      <TouchableOpacity onPress={() => copyToClipboard("ssossinfo88@gmail.com")} className="flex-row items-center">
+                      <Text className="text-accent font-inter-bold text-lg">{"cleanex.chadnova@gmail.com"}</Text>
+                      <TouchableOpacity onPress={() => copyToClipboard("cleanex.chadnova@gmail.com")} className="flex-row items-center">
                         <Copy color="#F59E0B" size={16} />
                         <Text className="text-accent font-inter ml-1">Copy</Text>
                       </TouchableOpacity>
