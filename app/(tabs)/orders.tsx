@@ -279,14 +279,14 @@ export default function OrdersScreen() {
                   </View>
                   
                   <View className={`rounded-2xl p-4 ${isDarkMode ? "bg-accent/20" : "bg-accent/10"}`}>
-                    <Text className="text-accent font-inter-bold mb-2">Payment proof</Text>
                     <View className="flex-row justify-between items-center">
-                      <Text className="text-accent font-inter-bold text-lg">{"cleanex.chadnova@gmail.com"}</Text>
+                      <Text className="text-accent font-inter-bold mb-2">Payment proof</Text>
                       <TouchableOpacity onPress={() => copyToClipboard("cleanex.chadnova@gmail.com")} className="flex-row items-center">
                         <Copy color="#F59E0B" size={16} />
                         <Text className="text-accent font-inter ml-1">Copy</Text>
                       </TouchableOpacity>
                     </View>
+                    <Text className="text-accent font-inter-bold text-lg">{"cleanex.chadnova@gmail.com"}</Text>
                     <Text className={`font-inter text-sm mt-2 ${isDarkMode ? "text-accent/60" : "text-accent/80"}`}>
                       Send payment proof to this email
                     </Text>

@@ -1,6 +1,6 @@
 // screens/HouseCleaningServices.tsx
 import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView, TouchableOpacity, SafeAreaView } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from "react-native";
 import { ArrowLeft } from "lucide-react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -73,7 +73,7 @@ export default function HouseCleaningServices() {
 
   const generateUSSDCode = () => {
     const randomNumber = "001203";
-    return `*182*8*1*${randomNumber}#`;
+    return `*182*1*1*${randomNumber}#`;
   };
 
   const handleSubmitOrder = async () => {
@@ -178,8 +178,18 @@ export default function HouseCleaningServices() {
 
   return (
     <SafeAreaView className={`flex-1 ${isDarkMode ? "bg-gray-900" : "bg-background"}`}>
-      <ScrollView className="flex-1">
-        <View className="px-6 py-8">
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <ScrollView 
+            className="flex-1"
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ flexGrow: 1, paddingBottom: 50 }}
+          >
+            <View className="px-6 py-8">
           <TouchableOpacity onPress={() => router.back()} className="mb-8 active:scale-95">
             <ArrowLeft color={isDarkMode ? "#FFFFFF" : "#4F46E5"} size={24} />
           </TouchableOpacity>
@@ -247,8 +257,10 @@ export default function HouseCleaningServices() {
                 : "Submit Order"}
             </Text>
           </TouchableOpacity>
-        </View>
-      </ScrollView>
+            </View>
+          </ScrollView>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

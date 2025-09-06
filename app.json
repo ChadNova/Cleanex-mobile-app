@@ -10,7 +10,11 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.cleanex.student"
+      "bundleIdentifier": "com.cleanex.student",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "CleanEx uses the camera to allow users to upload their profile photos"
+      }
     },
     "android": {
       "package": "com.cleanex.student"
@@ -28,13 +32,19 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#4F46E5",
-          "image": "./assets/images/splash.png",
-          "imageWidth": 200
+          "image": "./assets/images/logo.png",
+          "resizeMode": "contain"
         }
       ]
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "aeb1b54c-2061-44fa-81e2-0f5ab0a0ee7f"
+      }
     }
   }
 }

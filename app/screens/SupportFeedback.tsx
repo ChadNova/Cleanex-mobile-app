@@ -118,7 +118,6 @@ export default function SupportFeedbackScreen() {
 
   return (
     <SafeAreaView className={`flex-1 ${isDarkMode ? 'bg-gray-900' : 'bg-background'}`}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={{ flex: 1 }}
@@ -126,8 +125,9 @@ export default function SupportFeedbackScreen() {
           <ScrollView 
             className="flex-1" 
             showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-            contentContainerStyle={{ flexGrow: 1 }}
+            keyboardShouldPersistTaps="always"
+            scrollEnabled={true}
+            contentContainerStyle={{ flexGrow: 1, paddingBottom: 50 }}
           >
         {/* Header */}
         <LinearGradient
@@ -377,7 +377,6 @@ export default function SupportFeedbackScreen() {
         </View>
           </ScrollView>
         </KeyboardAvoidingView>
-      </TouchableWithoutFeedback>
     </SafeAreaView>
   );
 }

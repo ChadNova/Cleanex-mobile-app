@@ -34,6 +34,29 @@ const passwordSchema = yup.object().shape({
 
 export default function ForgotPasswordScreen() {
   const { showToast } = useToast();
+
+  const handleOtpPaste = (pastedText: string, index: number) => {
+    const digits = pastedText.replace(/\D/g, '').slice(0, 6);
+    const newOtp = ['', '', '', '', '', ''];
+    
+    // Fill the OTP array with pasted digits
+    for (let i = 0; i < digits.length && i < 6; i++) {
+      newOtp[i] = digits[i];
+    }
+    
+    setOtp(newOtp);
+    
+    // Focus the last filled input or the next empty one
+    const lastIndex = Math.min(digits.length - 1, 5);
+    setTimeout(() => {
+      if (digits.length === 6) {
+        // If all 6 digits are filled, blur the current input
+        otpInputs.current[index]?.blur();
+      } else {
+        otpInputs.current[lastIndex]?.focus();
+      }
+    }, 100);
+  };
   const [currentStep, setCurrentStep] = useState<Step>('email');
   const [userEmail, setUserEmail] = useState('');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -62,20 +85,43 @@ export default function ForgotPasswordScreen() {
   };
   
   const handleOtpChange = (value: string, index: number) => {
-    if (value.length > 1) return;
+    // Handle pasted content (multiple characters)
+    if (value.length > 1) {
+      const digits = value.replace(/\D/g, '').slice(0, 6);
+      const newOtp = ['', '', '', '', '', ''];
+      
+      // Fill the OTP array with pasted digits
+      for (let i = 0; i < digits.length && i < 6; i++) {
+        newOtp[i] = digits[i];
+      }
+      
+      setOtp(newOtp);
+      
+      // Focus the last filled input
+      const lastIndex = Math.min(digits.length - 1, 5);
+      setTimeout(() => {
+        otpInputs.current[lastIndex]?.focus();
+      }, 100);
+      return;
+    }
     
+    // Handle single character input
     const newOtp = [...otp];
-    newOtp[index] = value;
+    newOtp[index] = value.replace(/\D/g, ''); // Only allow digits
     setOtp(newOtp);
 
     // Auto-focus next input if value exists and not last input
     if (value && index < 5) {
-      otpInputs.current[index + 1]?.focus();
+      setTimeout(() => {
+        otpInputs.current[index + 1]?.focus();
+      }, 10);
     }
 
     // Auto-focus previous input on backspace/delete if empty
     if (!value && index > 0) {
-      otpInputs.current[index - 1]?.focus();
+      setTimeout(() => {
+        otpInputs.current[index - 1]?.focus();
+      }, 10);
     }
   };
   
@@ -367,7 +413,7 @@ export default function ForgotPasswordScreen() {
         {otp.map((digit, index) => (
           <TextInput
             key={index}
-            ref={ref => {otpInputs.current[index] = ref;}}
+            ref={(ref) => { otpInputs.current[index] = ref; }}
             style={styles.otpInput}
             value={digit}
             onChangeText={(value) => handleOtpChange(value, index)}

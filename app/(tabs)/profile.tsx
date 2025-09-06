@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Alert,
   Switch,
-  Image,
   ScrollView,
   LayoutAnimation,
   UIManager,
@@ -14,8 +13,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { User, Mail, Phone, MapPin, LogOut, CreditCard as Edit3, Save, Moon, Sun, Camera, ChevronDown, ChevronUp, Info, CircleHelp as HelpCircle } from 'lucide-react-native';
-import * as ImagePicker from 'expo-image-picker';
+import { User, Mail, Phone, MapPin, LogOut, CreditCard as Edit3, Save, Moon, Sun, ChevronDown, ChevronUp, Info, CircleHelp as HelpCircle } from 'lucide-react-native';
+import { Trash2 } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthProvider';
 import { supabase } from '@/lib/supabase';
@@ -63,7 +62,6 @@ export default function ProfileScreen() {
       full_name: editedUser.full_name,
       phone_number: editedUser.phone_number,
       address: editedUser.address,
-      // add any other allowed fields here
     };
       const response = await fetch(`${API_CONFIG.BASE_URL}/users/${user.id}`, {
         method: 'PUT',
@@ -81,7 +79,7 @@ export default function ProfileScreen() {
     }
 
       const updatedUser = await response.json();
-      setEditedUser({ ...editedUser, ...updatedUser, profile_photo: editedUser.profile_photo });
+      setEditedUser({ ...editedUser, ...updatedUser });
       setIsEditing(false);
       showToast({
       message: 'Profile Updated Successfully!',
@@ -108,68 +106,6 @@ export default function ProfileScreen() {
     }
 
   };
-
-const pickImage = async () => {
-  const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-  if (status !== 'granted') {
-      showToast({
-      message: 'Permission to access camera roll is required!',
-      type: 'info'
-    });
-    return;
-  }
-
-  const result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ImagePicker.MediaTypeOptions.Images,
-    allowsEditing: true,
-    aspect: [1, 1],
-    quality: 1,
-  });
-
-  if (!result.canceled) {
-    try {
-      const asset = result.assets[0];
-
-      const formData = new FormData();
-      formData.append('profile_photo', {
-        uri: asset.uri,
-        name: `${user.id}.jpg`,
-        type: 'image/jpeg',
-      } as any);
-
-      const response = await fetch(`${API_CONFIG.BASE_URL}/users/${user.id}/upload`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${user.access_token}`,
-        },
-        body: formData,
-      });
-
-      if (!response.ok) throw new Error('Upload failed');
-
-        const text = await response.text();
-
-        let results;
-        try {
-          results = JSON.parse(text);
-        } catch (parseErr) {
-          console.error('Failed to parse JSON:', parseErr);
-          throw new Error('Invalid JSON from server');
-        }
-
-        setEditedUser(results.user);
-
-    } catch (error) {
-      console.error('Image upload failed:', error);
-      showToast({
-      message: 'Image upload failed',
-      type: 'error'
-    });
-    }
-  }
-};
-
-
 
   const handleLogout = () => {
      Alert.alert('Logout', 'Are you sure you want to logout?', [
@@ -199,6 +135,22 @@ const pickImage = async () => {
     ]);
   };
 
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      'Delete Account',
+      'Are you sure you want to delete your account? You will need to verify your password to proceed.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Continue',
+          style: 'destructive',
+          onPress: () => {
+            router.push('/screens/DeleteAccountConfirmation');
+          },
+        },
+      ]
+    );
+  };
   if (loading || !editedUser) {
     return (
       <SafeAreaView className="flex-1 bg-background justify-center items-center">
@@ -257,9 +209,13 @@ const pickImage = async () => {
           </View>
         </View>
 
-        <ScrollView className="flex-1 px-6 py-6" showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          className="flex-1 px-6 py-6" 
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 100 }}
+        >
           {/* 🌙 Dark Mode Toggle */}
-          <View className={`flex-row items-center justify-between mb-8 px-6 py-5 rounded-3xl ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`} style={{
+          <View className={`flex-row items-center justify-between mb-8 px-3 py-5 rounded-3xl ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`} style={{
             shadowColor: '#000',
             shadowOffset: { width: 0, height: 4 },
             shadowOpacity: 0.1,
@@ -295,35 +251,19 @@ const pickImage = async () => {
 
           {/* Profile Picture */}
           <View className="items-center mb-8">
-            <TouchableOpacity onPress={pickImage} className="relative mb-6 active:scale-95">
-              {editedUser.profile_photo ? (
-                <Image 
-                  source={{ uri: editedUser.profile_photo }} 
-                  className="w-32 h-32 rounded-full"
-                  style={{
-                    shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 8 },
-                    shadowOpacity: 0.2,
-                    shadowRadius: 16,
-                  }}
-                />
-              ) : (
-                <View 
-                  className={`w-32 h-32 rounded-full items-center justify-center ${isDarkMode ? 'bg-gray-700' : 'bg-primary/10'}`}
-                  style={{
-                    shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 8 },
-                    shadowOpacity: 0.2,
-                    shadowRadius: 16,
-                  }}
-                >
-                  <User color={isDarkMode ? '#FFFFFF' : '#4F46E5'} size={48} />
-                </View>
-              )}
-              <View className="absolute bottom-2 right-2 bg-primary rounded-full p-3 border-4 border-white">
-                <Camera color="#FFFFFF" size={18} />
+            <View className="mb-6">
+              <View 
+                className={`w-32 h-32 rounded-full items-center justify-center ${isDarkMode ? 'bg-gray-700' : 'bg-primary/10'}`}
+                style={{
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 8 },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 16,
+                }}
+              >
+                <User color={isDarkMode ? '#FFFFFF' : '#4F46E5'} size={48} />
               </View>
-            </TouchableOpacity>
+            </View>
             <Text className={`text-2xl font-inter-bold ${isDarkMode ? 'text-white' : 'text-text'}`}>
               {editedUser.full_name || editedUser.name || 'Student'}
             </Text>
@@ -399,6 +339,17 @@ const pickImage = async () => {
                   </View>
                 </View>
               ))}
+
+              {/* Delete Account Button */}
+              <TouchableOpacity
+                onPress={handleDeleteAccount}
+                className="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 mt-4 active:scale-95"
+              >
+                <View className="flex-row items-center justify-center">
+                  <Trash2 color="#EF4444" size={20} />
+                  <Text className="text-red-500 font-inter-bold ml-2">Delete Account</Text>
+                </View>
+              </TouchableOpacity>
             </View>
           )}
 

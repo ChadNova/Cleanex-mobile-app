@@ -29,8 +29,8 @@ type Step = 'details' | 'verification' | 'password' | 'success';
 const registerSchema = yup.object().shape({
   fullName: yup.string().required('Full name is required'),
   email: yup.string().email('Invalid email').required('Email is required'),
-  phoneNumber: yup.string().required('Phone number is required'),
-  address: yup.string().required('Address is required'),
+  phoneNumber: yup.string(),
+  address: yup.string(),
   agreeToTerms: yup.boolean()
     .oneOf([true], 'You must accept the terms and conditions')
     .required('You must accept the terms and conditions'),
@@ -126,6 +126,29 @@ export default function RegisterScreen() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleOtpPaste = (pastedText: string, index: number) => {
+    const digits = pastedText.replace(/\D/g, '').slice(0, 6);
+    const newOtp = ['', '', '', '', '', ''];
+    
+    // Fill the OTP array with pasted digits
+    for (let i = 0; i < digits.length && i < 6; i++) {
+      newOtp[i] = digits[i];
+    }
+    
+    setOtp(newOtp);
+    
+    // Focus the last filled input or the next empty one
+    const lastIndex = Math.min(digits.length - 1, 5);
+    setTimeout(() => {
+      if (digits.length === 6) {
+        // If all 6 digits are filled, blur the current input
+        otpInputRefs.current[index]?.blur();
+      } else {
+        otpInputRefs.current[lastIndex]?.focus();
+      }
+    }, 100);
   };
 
   const handleResendOtp = async () => {
@@ -246,9 +269,9 @@ export default function RegisterScreen() {
         setCurrentStep('success');
 
         Animated.parallel([
-          Animated.timing(fadeAnim, { toValue: 1, duration: 800, useNativeDriver: true }),
+          Animated.timing(fadeAnim, { toValue: 1, duration: 1200, useNativeDriver: true }),
           Animated.spring(scaleAnim, { toValue: 1, tension: 50, friction: 7, useNativeDriver: true }),
-          Animated.timing(slideAnim, { toValue: 0, duration: 600, useNativeDriver: true }),
+          Animated.timing(slideAnim, { toValue: 0, duration: 1000, useNativeDriver: true }),
         ]).start();
 
         setTimeout(() => {
@@ -272,22 +295,25 @@ export default function RegisterScreen() {
   };
 
   const handleOtpChange = (value: string, index: number) => {
-  if (value.length > 1) return;
-  
-  const newOtp = [...otp];
-  newOtp[index] = value;
-  setOtp(newOtp);
+    // Handle single character input
+    const newOtp = [...otp];
+    newOtp[index] = value.replace(/\D/g, ''); // Only allow digits
+    setOtp(newOtp);
 
-  // Auto-focus next input if a digit was entered
-  if (value && index < 5) {
-    otpInputRefs.current[index + 1]?.focus();
-  }
+    // Auto-focus next input if a digit was entered
+    if (value && index < 5) {
+      setTimeout(() => {
+        otpInputRefs.current[index + 1]?.focus();
+      }, 10);
+    }
 
-  // Auto-focus previous input if backspace was pressed and current is empty
-  if (!value && index > 0) {
-    otpInputRefs.current[index - 1]?.focus();
-  }
-};
+    // Auto-focus previous input if backspace was pressed and current is empty
+    if (!value && index > 0) {
+      setTimeout(() => {
+        otpInputRefs.current[index - 1]?.focus();
+      }, 10);
+    }
+  };
 
   const renderStepIndicator = () => (
     <View style={styles.stepIndicator}>
@@ -404,7 +430,7 @@ export default function RegisterScreen() {
                 <MapPin size={20} color="#6b7280" style={styles.inputIcon} />
                 <TextInput
                   style={styles.input}
-                  placeholder="Address"
+                  placeholder="Address (optional)"
                   placeholderTextColor="#9ca3af"
                   value={values.address}
                   onChangeText={handleChange('address')}
@@ -694,16 +720,18 @@ export default function RegisterScreen() {
   return (
     <LinearGradient colors={['#667eea', '#764ba2']} style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={styles.keyboardView}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.keyboardView}
+        >
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="always"
+            scrollEnabled={true}
           >
-            <ScrollView
-              contentContainerStyle={styles.scrollContent}
-              showsVerticalScrollIndicator={false}
-              keyboardShouldPersistTaps="handled"
-            >
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+              <View style={{ flex: 1 }}>
               {currentStep !== 'details' && (
                 <TouchableOpacity
                   style={styles.backButton}
@@ -725,9 +753,10 @@ export default function RegisterScreen() {
               <View style={styles.content}>
                 {renderCurrentStep()}
               </View>
-            </ScrollView>
-          </KeyboardAvoidingView>
-        </TouchableWithoutFeedback>
+              </View>
+            </TouchableWithoutFeedback>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     </LinearGradient>
   );
