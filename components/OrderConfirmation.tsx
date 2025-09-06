@@ -1,11 +1,12 @@
 // components/OrderConfirmation.tsx
 import React from "react";
 import {SafeAreaView, ScrollView, View, Text, TouchableOpacity } from "react-native";
-import { ArrowLeft, Copy } from "lucide-react-native";
+import { ArrowLeft, Copy, CircleCheck as CheckCircle, Sparkles, Star, Heart } from "lucide-react-native";
 import { useTheme } from "@/contexts/ThemeContext";
 import * as Clipboard from "expo-clipboard";
 import { router } from "expo-router";
 import { useToast } from "@/components/ToastProvider";
+import { LinearGradient } from 'expo-linear-gradient';
 
 interface ServiceDetail {
   label: string;
@@ -31,126 +32,310 @@ interface OrderConfirmationProps {
 export default function OrderConfirmation({ order, onBack }: OrderConfirmationProps) {
   const { isDarkMode } = useTheme();
   const { showToast } = useToast();
+  
   const copyToClipboard = async (text: string) => {
     await Clipboard.setStringAsync(text);
-        showToast({
-        message: 'Copied to clipboard!',
-        type: 'success',
-        duration: 2000 // 2 seconds
-      });
-  };
-
-const renderServiceDetails = () => {
-  if (order.serviceName.toLowerCase().includes("laundry")) {
-    const clothes = order.services.find(s => s.label.toLowerCase() === "clothes");
-    const shoes = order.services.find(s => s.label.toLowerCase() === "shoes");
-
-    const shoesTotal = shoes ? shoes.quantity * shoes.pricePerUnit : 0;
-    const clothesTotal = clothes ? clothes.pricePerUnit : 0;
-    const ironingTotal = order.includeIroning ? order.ironingPrice : 0; // Use the passed ironingPrice
-
-    return (
-      <>
-        {shoes && (
-          <Text className={`font-inter ${isDarkMode ? "text-gray-300" : "text-text-secondary"}`}>
-            {shoes.label}: {shoes.quantity} {shoes.unit} × {shoes.pricePerUnit} RWF = {shoesTotal} RWF
-          </Text>
-        )}
-
-        {clothes && (
-          <Text className={`font-inter ${isDarkMode ? "text-gray-300" : "text-text-secondary"}`}>
-            {clothes.label}: {clothes.quantity} {clothes.unit} = {clothesTotal} RWF
-          </Text>
-        )}
-
-        {order.includeIroning && (
-          <Text className={`font-inter ${isDarkMode ? "text-gray-300" : "text-text-secondary"}`}>
-            Ironing: {ironingTotal} RWF
-          </Text>
-        )}
-      </>
-    );
-  }
-
-    // Generic fallback for all other services (e.g., House Cleaning)
-    return order.services.map((s, index) => {
-      const total = s.quantity * s.pricePerUnit;
-      return (
-        <Text
-          key={index}
-          className={`font-inter ${isDarkMode ? "text-gray-300" : "text-text-secondary"}`}
-        >
-          {s.label}: {s.quantity} × {s.pricePerUnit} RWF = {total} RWF
-        </Text>
-      );
+    showToast({
+      message: 'Copied to clipboard!',
+      type: 'success',
+      duration: 2000
     });
   };
 
-  return (
-    <SafeAreaView className={`flex-1 ${isDarkMode ? "bg-gray-900" : "bg-background"}`}>
-    <ScrollView className="flex-1 px-6 py-8">
-      <TouchableOpacity onPress={onBack} className="mb-8 active:scale-95">
-        <ArrowLeft color={isDarkMode ? "#FFFFFF" : "#4F46E5"} size={24} />
-      </TouchableOpacity>
+  const renderServiceDetails = () => {
+    if (order.serviceName.toLowerCase().includes("laundry")) {
+      const clothes = order.services.find(s => s.label.toLowerCase() === "clothes");
+      const shoes = order.services.find(s => s.label.toLowerCase() === "shoes");
 
-      <View className={`rounded-2xl p-6 shadow-sm border ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-surface border-gray-100"}`}>
-        <View className="items-center mb-6">
-          <View className={`rounded-full p-6 mb-4 ${isDarkMode ? "bg-green-900/30" : "bg-green-100"}`}>
-            <Text className="text-4xl">✅</Text>
-          </View>
-          <Text className={`text-2xl font-inter-bold mb-2 ${isDarkMode ? "text-white" : "text-text"}`}>
-            Order Confirmed!
-          </Text>
-          <Text className={`font-inter text-center ${isDarkMode ? "text-gray-300" : "text-text-secondary"}`}>
-            Your order has been submitted successfully
-          </Text>
+      const shoesTotal = shoes ? shoes.quantity * shoes.pricePerUnit : 0;
+      const clothesTotal = clothes ? clothes.pricePerUnit : 0;
+      const ironingTotal = order.includeIroning ? order.ironingPrice : 0;
+
+      return (
+        <View className="space-y-3">
+          {shoes && shoes.quantity > 0 && (
+            <View className="flex-row justify-between items-center">
+              <View className="flex-row items-center">
+                <View className="w-2 h-2 bg-blue-500 rounded-full mr-3" />
+                <Text className={`font-inter ${isDarkMode ? "text-gray-300" : "text-text-secondary"}`}>
+                  {shoes.label}: {shoes.quantity} {shoes.unit}
+                </Text>
+              </View>
+              <Text className={`font-inter-bold ${isDarkMode ? "text-white" : "text-text"}`}>
+                {shoesTotal} RWF
+              </Text>
+            </View>
+          )}
+
+          {clothes && clothes.quantity > 0 && (
+            <View className="flex-row justify-between items-center">
+              <View className="flex-row items-center">
+                <View className="w-2 h-2 bg-green-500 rounded-full mr-3" />
+                <Text className={`font-inter ${isDarkMode ? "text-gray-300" : "text-text-secondary"}`}>
+                  {clothes.label}: {clothes.quantity} {clothes.unit}
+                </Text>
+              </View>
+              <Text className={`font-inter-bold ${isDarkMode ? "text-white" : "text-text"}`}>
+                {clothesTotal} RWF
+              </Text>
+            </View>
+          )}
+
+          {order.includeIroning && (
+            <View className="flex-row justify-between items-center">
+              <View className="flex-row items-center">
+                <View className="w-2 h-2 bg-amber-500 rounded-full mr-3" />
+                <Text className={`font-inter ${isDarkMode ? "text-gray-300" : "text-text-secondary"}`}>
+                  Ironing Service
+                </Text>
+              </View>
+              <Text className={`font-inter-bold ${isDarkMode ? "text-white" : "text-text"}`}>
+                {ironingTotal} RWF
+              </Text>
+            </View>
+          )}
         </View>
+      );
+    }
 
-        <View className={`rounded-xl p-4 mb-6 ${isDarkMode ? "bg-gray-700" : "bg-gray-50"}`}>
-          <Text className={`font-inter mb-2 ${isDarkMode ? "text-gray-300" : "text-text-secondary"}`}>
-            Order Summary
-          </Text>
-          <Text className={`text-lg font-inter-bold ${isDarkMode ? "text-white" : "text-text"}`}>
-            {order.serviceName}
-          </Text>
-
-          {renderServiceDetails()}
-
-          <Text className="text-xl font-inter-bold text-primary mt-2">
-            Total: {order.total} RWF
-          </Text>
-        </View>
-
-        <View className={`rounded-xl p-4 mb-4 ${isDarkMode ? "bg-primary/20" : "bg-primary/10"}`}>
-          <View className="flex-row justify-between items-center mb-2">
-            <Text className="text-primary font-inter-bold">USSD Payment Code</Text>
-            <TouchableOpacity onPress={() => copyToClipboard(order.ussdCode)} className="flex-row items-center">
-              <Copy color="#4F46E5" size={16} />
-              <Text className="text-primary font-inter ml-1">Copy</Text>
-            </TouchableOpacity>
-          </View>
-          <Text className="text-primary font-inter-bold text-xl">{order.ussdCode}</Text>
-        </View>
-
-        <View className={`rounded-xl p-4 mb-6 ${isDarkMode ? "bg-secondary/20" : "bg-secondary/10"}`}>
-          <Text className="text-secondary font-inter-bold mb-2">Payment proof</Text>
-          <View className="flex-row justify-between items-center">
-            <Text className="text-secondary font-inter-bold text-lg">{order.whatsappNumber}</Text>
-            <TouchableOpacity onPress={() => copyToClipboard(order.whatsappNumber)} className="flex-row items-center">
-              <Copy color="#10B981" size={16} />
-              <Text className="text-secondary font-inter ml-1">Copy</Text>
-            </TouchableOpacity>
-          </View>
-          <Text className={`font-inter text-sm mt-2 ${isDarkMode ? "text-secondary/60" : "text-secondary/80"}`}>
-            Send payment proof to this email
-          </Text>
-        </View>
-
-        <TouchableOpacity onPress={() => router.push("/(tabs)/orders")} className="bg-primary rounded-xl py-4">
-          <Text className="text-white font-inter-bold text-center">View My Orders</Text>
-        </TouchableOpacity>
+    // Generic fallback for all other services
+    return (
+      <View className="space-y-3">
+        {order.services.map((s, index) => {
+          if (s.quantity === 0) return null;
+          const total = s.quantity * s.pricePerUnit;
+          const colors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-pink-500'];
+          return (
+            <View key={index} className="flex-row justify-between items-center">
+              <View className="flex-row items-center">
+                <View className={`w-2 h-2 ${colors[index % colors.length]} rounded-full mr-3`} />
+                <Text className={`font-inter ${isDarkMode ? "text-gray-300" : "text-text-secondary"}`}>
+                  {s.label}: {s.quantity} × {s.pricePerUnit} RWF
+                </Text>
+              </View>
+              <Text className={`font-inter-bold ${isDarkMode ? "text-white" : "text-text"}`}>
+                {total} RWF
+              </Text>
+            </View>
+          );
+        })}
       </View>
-    </ScrollView>
+    );
+  };
+
+  return (
+    <SafeAreaView className={`flex-1 ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
+      {/* Floating decorative elements */}
+      <View className="absolute top-20 right-8 opacity-20">
+        <Sparkles color={isDarkMode ? "#FFFFFF" : "#4F46E5"} size={24} />
+      </View>
+      <View className="absolute top-32 left-8 opacity-15">
+        <Star color={isDarkMode ? "#FFFFFF" : "#4F46E5"} size={20} />
+      </View>
+      <View className="absolute bottom-40 right-12 opacity-10">
+        <Heart color={isDarkMode ? "#FFFFFF" : "#4F46E5"} size={18} />
+      </View>
+
+      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+        {/* Header */}
+        <View className="px-6 pt-8 pb-4">
+          <TouchableOpacity 
+            onPress={onBack} 
+            className="mb-8 active:scale-95"
+            style={{
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.1,
+              shadowRadius: 4,
+            }}
+          >
+            <View className={`w-12 h-12 rounded-full items-center justify-center ${isDarkMode ? "bg-gray-800" : "bg-white"}`}>
+              <ArrowLeft color={isDarkMode ? "#FFFFFF" : "#4F46E5"} size={24} />
+            </View>
+          </TouchableOpacity>
+        </View>
+
+        <View className="px-6">
+          {/* Success Animation Container */}
+          <View className={`rounded-3xl p-8 mb-8 ${isDarkMode ? "bg-gray-800" : "bg-white"}`} style={{
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 12 },
+            shadowOpacity: 0.15,
+            shadowRadius: 24,
+            elevation: 12
+          }}>
+            {/* Success Icon with Gradient Background */}
+            <View className="items-center mb-8">
+              <LinearGradient
+                colors={['#10B981', '#059669']}
+                className="w-24 h-24 rounded-full items-center justify-center mb-6"
+                style={{
+                  shadowColor: '#10B981',
+                  shadowOffset: { width: 0, height: 8 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 16,
+                }}
+              >
+                <CheckCircle color="#FFFFFF" size={48} strokeWidth={2} />
+              </LinearGradient>
+              
+              <Text className={`text-3xl font-inter-bold mb-3 ${isDarkMode ? "text-white" : "text-text"}`}>
+                Order Confirmed! 🎉
+              </Text>
+              <Text className={`font-inter text-center text-lg leading-7 ${isDarkMode ? "text-gray-300" : "text-text-secondary"}`}>
+                Your order has been submitted successfully.{"\n"}We'll get started right away!
+              </Text>
+            </View>
+
+            {/* Order Summary Card */}
+            <View className={`rounded-2xl p-6 mb-6 ${isDarkMode ? "bg-gray-700/50" : "bg-gray-50"}`}>
+              <View className="flex-row items-center mb-4">
+                <View className="bg-primary/10 rounded-full p-2 mr-3">
+                  <Text className="text-primary text-lg">📋</Text>
+                </View>
+                <Text className={`font-inter-bold text-lg ${isDarkMode ? "text-white" : "text-text"}`}>
+                  Order Summary
+                </Text>
+              </View>
+              
+              <Text className={`text-xl font-inter-bold mb-4 ${isDarkMode ? "text-white" : "text-text"}`}>
+                {order.serviceName}
+              </Text>
+
+              {renderServiceDetails()}
+
+              {/* Total with gradient background */}
+              <View className="mt-6 pt-4 border-t border-gray-200/30">
+                <LinearGradient
+                  colors={isDarkMode ? ['#4F46E5', '#7C3AED'] : ['#4F46E5', '#6366F1']}
+                  className="rounded-xl p-4"
+                >
+                  <View className="flex-row justify-between items-center">
+                    <Text className="text-white font-inter-bold text-lg">
+                      Total Amount
+                    </Text>
+                    <Text className="text-white font-inter-bold text-2xl">
+                      {order.total} RWF
+                    </Text>
+                  </View>
+                </LinearGradient>
+              </View>
+            </View>
+          </View>
+
+          {/* Payment Information */}
+          <View className="space-y-4 mb-8">
+            {/* USSD Code Card */}
+            <View className={`rounded-2xl overflow-hidden ${isDarkMode ? "bg-gray-800" : "bg-white"}`} style={{
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 8 },
+              shadowOpacity: 0.1,
+              shadowRadius: 16,
+              elevation: 8
+            }}>
+              <LinearGradient
+                colors={['#4F46E5', '#6366F1']}
+                className="p-4"
+              >
+                <View className="flex-row justify-between items-center">
+                  <View className="flex-row items-center">
+                    <View className="bg-white/20 rounded-full p-2 mr-3">
+                      <Text className="text-white text-lg">💳</Text>
+                    </View>
+                    <Text className="text-white font-inter-bold text-lg">
+                      USSD Payment Code
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => copyToClipboard(order.ussdCode)}
+                    className="bg-white/20 rounded-full p-2 active:scale-95"
+                  >
+                    <Copy color="#FFFFFF" size={18} />
+                  </TouchableOpacity>
+                </View>
+              </LinearGradient>
+              
+              <View className="p-4">
+                <Text className="text-primary font-inter-bold text-2xl text-center tracking-wider">
+                  {order.ussdCode}
+                </Text>
+                <Text className={`font-inter text-center text-sm mt-2 ${isDarkMode ? "text-gray-400" : "text-text-secondary"}`}>
+                  Dial this code on your phone to pay
+                </Text>
+              </View>
+            </View>
+
+            {/* Payment Proof Card */}
+            <View className={`rounded-2xl overflow-hidden ${isDarkMode ? "bg-gray-800" : "bg-white"}`} style={{
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 8 },
+              shadowOpacity: 0.1,
+              shadowRadius: 16,
+              elevation: 8
+            }}>
+              <LinearGradient
+                colors={['#10B981', '#059669']}
+                className="p-4"
+              >
+                <View className="flex-row justify-between items-center">
+                  <View className="flex-row items-center">
+                    <View className="bg-white/20 rounded-full p-2 mr-3">
+                      <Text className="text-white text-lg">📧</Text>
+                    </View>
+                    <Text className="text-white font-inter-bold text-lg">
+                      Send Payment Proof
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => copyToClipboard(order.whatsappNumber)}
+                    className="bg-white/20 rounded-full p-2 active:scale-95"
+                  >
+                    <Copy color="#FFFFFF" size={18} />
+                  </TouchableOpacity>
+                </View>
+              </LinearGradient>
+              
+              <View className="p-4">
+                <Text className="text-secondary font-inter-bold text-lg text-center">
+                  {order.whatsappNumber}
+                </Text>
+                <Text className={`font-inter text-center text-sm mt-2 ${isDarkMode ? "text-gray-400" : "text-text-secondary"}`}>
+                  Send your payment screenshot to this email
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          {/* Action Button */}
+          <TouchableOpacity
+            onPress={() => router.push("/(tabs)/orders")}
+            className="mb-8 active:scale-95"
+            style={{
+              shadowColor: '#4F46E5',
+              shadowOffset: { width: 0, height: 8 },
+              shadowOpacity: 0.3,
+              shadowRadius: 16,
+            }}
+          >
+            <LinearGradient
+              colors={['#4F46E5', '#7C3AED']}
+              className="rounded-2xl p-4"
+            >
+              <Text className="text-white font-inter-bold text-center text-lg">
+                View My Orders ✨
+              </Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          {/* Thank You Message */}
+          <View className={`rounded-2xl p-6 mb-8 ${isDarkMode ? "bg-gray-800/50" : "bg-blue-50"}`}>
+            <Text className={`font-inter text-center text-lg leading-7 ${isDarkMode ? "text-gray-300" : "text-blue-800"}`}>
+              Thank you for choosing our service! 💙{"\n"}
+              We'll take great care of your items and have them ready within 24 hours.
+            </Text>
+          </View>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }

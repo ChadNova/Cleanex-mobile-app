@@ -221,6 +221,23 @@ export default function LaundryServices() {
             Select quantity of clothes and shoes to wash, and whether to include ironing.
           </Text>
 
+          {/* Price Calculation Hint */}
+          <View className={`rounded-2xl p-4 mb-6 ${isDarkMode ? "bg-blue-900/20 border border-blue-800/30" : "bg-blue-50 border border-blue-200"}`}>
+            <View className="flex-row items-start">
+              <Text className="text-2xl mr-3">💡</Text>
+              <View className="flex-1">
+                <Text className={`font-inter-bold text-sm mb-2 ${isDarkMode ? "text-blue-300" : "text-blue-800"}`}>
+                  How we calculate prices:
+                </Text>
+                <Text className={`font-inter text-sm leading-5 ${isDarkMode ? "text-blue-200" : "text-blue-700"}`}>
+                  • Clothes: Batch pricing (1-20 items = 2,000 RWF, 21-50 = 4,000 RWF, 51-75 = 5,500 RWF, 76-100 = 7,000 RWF, 101+ = 10,000 RWF){"\n"}
+                  • Shoes: 300 RWF per pair{"\n"}
+                  • Ironing: 75% of clothes batch price
+                </Text>
+              </View>
+            </View>
+          </View>
+
           {/* Clothes Quantity */}
           <QuantitySelector
             quantity={clothesQuantity}

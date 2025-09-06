@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { useFonts } from 'expo-font';
 import { Inter_400Regular, Inter_700Bold } from '@expo-google-fonts/inter';
@@ -33,18 +34,20 @@ export default function RootLayout() {
   return (
     
     <ThemeProvider>
-      <AuthProvider>
-        <ToastProvider>
-         {/* Wrap everything with ToastProvider */}
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="index" />
-            <Stack.Screen name="auth" />
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="+not-found" />
-          </Stack>
-          <StatusBar style="light" />
-         </ToastProvider>
-      </AuthProvider>
+      <SafeAreaProvider>
+        <AuthProvider>
+          <ToastProvider>
+           {/* Wrap everything with ToastProvider */}
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="index" />
+              <Stack.Screen name="auth" />
+              <Stack.Screen name="(tabs)" />
+              <Stack.Screen name="+not-found" />
+            </Stack>
+            <StatusBar style="light" />
+           </ToastProvider>
+        </AuthProvider>
+      </SafeAreaProvider>
     </ThemeProvider>
    
   );
