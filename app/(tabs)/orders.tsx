@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useToast } from '@/components/ToastProvider';
 import { Clock, CircleCheck as CheckCircle, Circle as XCircle, Copy } from 'lucide-react-native';
 import { Shirt } from 'lucide-react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { supabase } from '@/lib/supabase';
 import * as Clipboard from 'expo-clipboard';
 import { useTheme } from '@/contexts/ThemeContext';
 import { API_CONFIG } from '@/config/config';
@@ -18,54 +18,32 @@ export default function OrdersScreen() {
 
   // Load user and token from AsyncStorage on mount
   useEffect(() => {
-    async function loadUserAndToken() {
-      try {
-        const userJson = await AsyncStorage.getItem('user');
-        const tokenStored = await AsyncStorage.getItem('token');
+    const init = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
 
-        if (userJson) {
-          setUser(JSON.parse(userJson));
-        }
-        if (tokenStored) {
-          setToken(tokenStored);
-        }
-      } catch (error) {
-        console.error('Error loading user/token:', error);
-      }
-    }
-    loadUserAndToken();
+      setUser(session.user);
+      loadOrders(session.user.id, session.access_token);
+    };
+
+    init();
   }, []);
 
-  // Reload orders whenever user and token are set
-  useEffect(() => {
-    if (user && token) {
-      loadOrders();
-    }
-  }, [user, token]);
-
-  const loadOrders = async () => {
+  const loadOrders = async (userId: string, accessToken: string) => {
     try {
-      if (!token) throw new Error("User not logged in");
-      if (!user?.id) throw new Error("User ID not found");
-
-      // If your backend expects userId in URL:
-      const response = await fetch(`${API_CONFIG.BASE_URL}/orders/${user.id}`, {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/orders/${userId}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
         },
       });
 
-      const text = await response.text();
-
-      // Try to parse JSON response
-      const result = JSON.parse(text);
-
+      const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Failed to fetch orders");
 
       setOrders(result.orders);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
+    } catch (err) {
+      console.error('Error fetching orders:', err);
       setOrders([]);
     }
   };

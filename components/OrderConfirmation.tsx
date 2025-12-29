@@ -210,7 +210,7 @@ export default function OrderConfirmation({ order, onBack }: OrderConfirmationPr
                   colors={isDarkMode ? ['#4F46E5', '#7C3AED'] : ['#4F46E5', '#6366F1']}
                   className="rounded-xl p-4"
                 >
-                  <View className="flex-row justify-between items-center">
+                  <View className="flex-row justify-between rounded-full items-center">
                     <Text className="text-white font-inter-bold text-lg">
                       Total Amount
                     </Text>
@@ -324,14 +324,10 @@ export default function OrderConfirmation({ order, onBack }: OrderConfirmationPr
               end={{ x: 1, y: 1 }}
               className="px-8 py-6 flex-row items-center justify-center"
             >
-              <View className="bg-white/20 rounded-full p-2 mr-3">
-                <Text className="text-white text-lg">📋</Text>
-              </View>
-              <Text className="text-white font-inter-bold text-xl tracking-wide">
-                View My Orders
-              </Text>
-              <View className="bg-white/20 rounded-full p-2 ml-3">
-                <Text className="text-white text-lg">✨</Text>
+              <View className="items-center rounded-full p-3">
+                <Text className="text-white font-inter-bold text-xl tracking-wide">
+                  📋 View My Orders ✨
+                </Text>
               </View>
             </LinearGradient>
           </TouchableOpacity>
