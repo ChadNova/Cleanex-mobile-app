@@ -36,53 +36,67 @@ const services = [
 export default function HomeScreen() {
   const { showToast } = useToast();
   const [user, setUser] = useState<any>(null);
+  const [orders, setOrders] = useState<any[]>([]);
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
+  const [monthlyOrdersCount, setMonthlyOrdersCount] = useState(0);
+
   const { isDarkMode } = useTheme();
 
-  useEffect(() => {
-    const init = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        const userObj = session.user;
-        setUser(userObj);
-        await AsyncStorage.setItem('user', JSON.stringify(userObj));
+useEffect(() => {
+  const init = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) return;
 
-        const token = session.access_token;
-        if (token && userObj.id) {
-          loadRecentOrders(userObj.id, token);
-        }
-      }
-    };
-    
-    init();
-  }, []);
-
-  const loadRecentOrders = async (userId: string, accessToken: string) => {
-    try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}/orders/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const result = await response.json();
-
-      if (response.ok && Array.isArray(result.orders)) {
-        setRecentOrders(
-          result.orders
-            .sort((a: { created_at: string }, b: { created_at: string }) =>
-              new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-            )
-            .slice(0, 2)
-        );
-      } else {
-        console.error('Failed to fetch recent orders:', result?.error);
-      }
-    } catch (err) {
-      console.error('Error fetching recent orders:', err);
-    }
+    loadOrders(session.user.id, session.access_token);
   };
+
+  init();
+}, []);
+
+const loadOrders = async (userId: string, accessToken: string) => {
+  try {
+    const response = await fetch(`${API_CONFIG.BASE_URL}/orders/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const result = await response.json();
+    if (!response.ok || !Array.isArray(result.orders)) {
+      throw new Error('Failed to fetch orders');
+    }
+
+    const allOrders = result.orders;
+
+    setOrders(allOrders);
+
+    // 🔹 Recent 2 orders
+    const sorted = [...allOrders].sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() -
+        new Date(a.created_at).getTime()
+    );
+
+    setRecentOrders(sorted.slice(0, 2));
+
+    // 🔹 Orders this month
+    const now = new Date();
+    const monthOrders = allOrders.filter(order => {
+      const d = new Date(order.created_at);
+      return (
+        d.getMonth() === now.getMonth() &&
+        d.getFullYear() === now.getFullYear()
+      );
+    });
+
+    setMonthlyOrdersCount(monthOrders.length);
+
+  } catch (err) {
+    console.error('Error fetching orders:', err);
+  }
+};
+
 
   const handleServicePress = (service: any) => {
     if (service.id === 'laundry') {
@@ -104,6 +118,34 @@ export default function HomeScreen() {
     if (hour < 17) return 'Good Afternoon';
     return 'Good Evening';
   };
+
+
+const getStatusStyles = (status: string) => {
+  switch (status) {
+    case 'pending':
+      return {
+        text: 'text-amber-700',
+        label: 'Pending',
+      };
+    case 'completed':
+      return {
+        text: 'text-green-700',
+        label: 'Completed',
+      };
+    case 'cancelled':
+      return {
+        bg: 'bg-red-100',
+        text: 'text-red-700',
+        label: 'Cancelled',
+      };
+    default:
+      return {
+        bg: 'bg-gray-100',
+        text: 'text-gray-700',
+        label: status,
+      };
+  }
+};
 
   return (
     <SafeAreaView className={`flex-1 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
@@ -135,7 +177,7 @@ export default function HomeScreen() {
           </View>
 
           {/* Modern Service Card */}
-          <View className={`rounded-3xl p-6 ${isDarkMode ? 'bg-gray-800' : 'bg-gradient-to-br from-blue-50 to-purple-50'}`}>
+          <View className={`rounded-3xl p-6 ${isDarkMode ? 'bg-gray-700/50' : 'bg-gradient-to-br from-blue-50 to-purple-50'}`}>
             <View className="flex-row items-start justify-between mb-4">
               <View className="flex-1">
                 <Text className={`text-2xl font-inter-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -151,7 +193,7 @@ export default function HomeScreen() {
             </View>
             
             {/* Stats Row */}
-            <View className="flex-row items-center justify-between pt-4">
+            <View className="flex-row items-center justify-between pt-4 border-t border-gray-200/30">
               <View className="flex-row items-center">
                 <View className="flex-row items-center">
                   <Clock color={isDarkMode ? '#9CA3AF' : '#6B7280'} size={14} />
@@ -177,7 +219,7 @@ export default function HomeScreen() {
                 <TrendingUp color="#10B981" size={20} />
                 <Text className={`ml-2 font-inter-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Orders</Text>
               </View>
-              <Text className="text-2xl font-inter-bold text-primary">{recentOrders.length}</Text>
+              <Text className="text-2xl font-inter-bold text-primary">{monthlyOrdersCount}</Text>
               <Text className={`text-sm font-inter ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>This month</Text>
             </View>
 
@@ -301,11 +343,17 @@ export default function HomeScreen() {
                     <Text className={`font-inter-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                       {order.services?.name || order.service_id}
                     </Text>
-                    <View className="bg-green-100 rounded-full px-3 py-1">
-                      <Text className="text-green-800 font-inter-bold text-xs">Completed</Text>
-                    </View>
+                    {(() => {
+                      const status = getStatusStyles(order.status);
+                      return (
+                        <View className={`${status.bg} rounded-full px-3 py-1`}>
+                          <Text className={`${status.text} font-inter-bold text-xs capitalize`}>
+                            {status.label}
+                          </Text>
+                        </View>
+                      );
+                    })()}
                   </View>
-                  
                   <View className="flex-row justify-between items-center">
                     <Text className={`font-inter ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                       {order.total_price} RWF

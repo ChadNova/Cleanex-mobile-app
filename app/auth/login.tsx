@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -30,6 +30,7 @@ export default function LoginScreen() {
   const { showToast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   const handleLogin = async (values: { email: string; password: string }) => {
     setLoading(true);
@@ -51,8 +52,14 @@ export default function LoginScreen() {
 
       const { session, user } = data;
 
-      await AsyncStorage.setItem('token', session.access_token);
-      await AsyncStorage.setItem('user', JSON.stringify(user));
+      // Store remember me preference
+      if (rememberMe) {
+        await AsyncStorage.setItem('rememberMe', 'true');
+        await AsyncStorage.setItem('savedEmail', values.email);
+      } else {
+        await AsyncStorage.removeItem('rememberMe');
+        await AsyncStorage.removeItem('savedEmail');
+      }
 
       showToast({
         message: 'Logged in successfully!',
@@ -72,6 +79,21 @@ export default function LoginScreen() {
       setLoading(false);
     }
   };
+
+  // Load saved email on component mount
+  useEffect(() => {
+    const loadSavedCredentials = async () => {
+      try {
+        const savedRememberMe = await AsyncStorage.getItem('rememberMe');
+        if (savedRememberMe === 'true') {
+          setRememberMe(true);
+        }
+      } catch (error) {
+        console.error('Error loading saved credentials:', error);
+      }
+    };
+    loadSavedCredentials();
+  }, []);
 
   return (
     <LinearGradient colors={['#667eea', '#764ba2']} style={styles.container}>
@@ -109,11 +131,31 @@ export default function LoginScreen() {
                 </View>
 
                 <Formik
-                  initialValues={{ email: '', password: '' }}
+                  initialValues={{ 
+                    email: '', 
+                    password: '' 
+                  }}
                   validationSchema={loginSchema}
                   onSubmit={handleLogin}
                 >
-                  {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+                  {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => {
+                    // Load saved email when component mounts
+                    useEffect(() => {
+                      const loadSavedEmail = async () => {
+                        try {
+                          const savedEmail = await AsyncStorage.getItem('savedEmail');
+                          const savedRememberMe = await AsyncStorage.getItem('rememberMe');
+                          if (savedRememberMe === 'true' && savedEmail) {
+                            setFieldValue('email', savedEmail);
+                          }
+                        } catch (error) {
+                          console.error('Error loading saved email:', error);
+                        }
+                      };
+                      loadSavedEmail();
+                    }, [setFieldValue]);
+
+                    return (
                     <View style={styles.formContainer}>
                       <View style={styles.inputContainer}>
                         <Text style={styles.inputLabel}>Email Address</Text>
@@ -164,6 +206,23 @@ export default function LoginScreen() {
                         )}
                       </View>
 
+                      {/* Remember Me Checkbox */}
+                      <View style={styles.rememberMeContainer}>
+                        <TouchableOpacity
+                          style={[styles.checkbox, rememberMe && styles.checkedCheckbox]}
+                          onPress={() => setRememberMe(!rememberMe)}
+                        >
+                          {rememberMe && (
+                            <Text style={styles.checkmark}>✓</Text>
+                          )}
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() => setRememberMe(!rememberMe)}
+                          style={styles.rememberMeTextContainer}
+                        >
+                          <Text style={styles.rememberMeText}>Remember me</Text>
+                        </TouchableOpacity>
+                      </View>
                       <TouchableOpacity
                         style={styles.forgotPassword}
                         onPress={() => router.push('/auth/forgot-password')}
@@ -193,7 +252,7 @@ export default function LoginScreen() {
                         </TouchableOpacity>
                       </View>
                     </View>
-                  )}
+                  )}}
                 </Formik>
               </View>
               </View>
@@ -364,5 +423,38 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 4,
     marginLeft: 8,
+  },
+  rememberMeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+    paddingHorizontal: 8,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    borderWidth: 2,
+    borderColor: '#6366f1',
+    backgroundColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  checkedCheckbox: {
+    backgroundColor: '#6366f1',
+  },
+  checkmark: {
+    color: '#ffffff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  rememberMeTextContainer: {
+    flex: 1,
+  },
+  rememberMeText: {
+    fontSize: 14,
+    color: '#6b7280',
+    fontWeight: '500',
   },
 });

@@ -70,7 +70,7 @@ export default function LaundryServices() {
 
   const generateUSSDCode = () => {
     const randomNumber = "001203";
-    return `*182*1*1*${randomNumber}#`;
+    return `*182*8*1*${randomNumber}#`;
   };
 
  const handleSubmitOrder = async () => {

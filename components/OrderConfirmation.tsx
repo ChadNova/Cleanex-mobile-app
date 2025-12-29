@@ -224,9 +224,9 @@ export default function OrderConfirmation({ order, onBack }: OrderConfirmationPr
           </View>
 
           {/* Payment Information */}
-          <View className="space-y-4 mb-8">
+          <View className="space-y-6 mb-6">
             {/* USSD Code Card */}
-            <View className={`rounded-2xl overflow-hidden ${isDarkMode ? "bg-gray-800" : "bg-white"}`} style={{
+            <View className={`rounded-2xl mb-4 overflow-hidden ${isDarkMode ? "bg-gray-800" : "bg-white"}`} style={{
               shadowColor: '#000',
               shadowOffset: { width: 0, height: 8 },
               shadowOpacity: 0.1,
@@ -306,24 +306,33 @@ export default function OrderConfirmation({ order, onBack }: OrderConfirmationPr
             </View>
           </View>
 
-          {/* Action Button */}
+          {/* Beautiful Action Button */}
           <TouchableOpacity
             onPress={() => router.push("/(tabs)/orders")}
-            className="mb-8 active:scale-95"
+            className="mb-8 active:scale-95 rounded-3xl overflow-hidden"
             style={{
               shadowColor: '#4F46E5',
-              shadowOffset: { width: 0, height: 8 },
-              shadowOpacity: 0.3,
-              shadowRadius: 16,
+              shadowOffset: { width: 0, height: 12 },
+              shadowOpacity: 0.4,
+              shadowRadius: 20,
+              elevation: 15
             }}
           >
             <LinearGradient
-              colors={['#4F46E5', '#7C3AED']}
-              className="rounded-2xl p-4"
+              colors={['#667eea', '#764ba2', '#667eea']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              className="px-8 py-6 flex-row items-center justify-center"
             >
-              <Text className="text-white font-inter-bold text-center text-lg">
-                View My Orders ✨
+              <View className="bg-white/20 rounded-full p-2 mr-3">
+                <Text className="text-white text-lg">📋</Text>
+              </View>
+              <Text className="text-white font-inter-bold text-xl tracking-wide">
+                View My Orders
               </Text>
+              <View className="bg-white/20 rounded-full p-2 ml-3">
+                <Text className="text-white text-lg">✨</Text>
+              </View>
             </LinearGradient>
           </TouchableOpacity>
 

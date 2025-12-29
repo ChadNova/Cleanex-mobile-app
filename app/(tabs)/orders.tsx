@@ -236,7 +236,7 @@ export default function OrdersScreen() {
                       )}
                     </View>
                     
-                    <View className="flex-row items-center bg-yellow-100 px-3 py-2 rounded-full">
+                    <View className="flex-row items-center  px-3 py-2 rounded-full">
                       {getStatusIcon(order.status)}
                       <Text className={`ml-2 font-inter-bold capitalize text-sm ${getStatusColor(order.status)}`}>
                         {order.status}
@@ -270,12 +270,12 @@ export default function OrdersScreen() {
                   <View className={`rounded-2xl p-4 mb-4 ${isDarkMode ? "bg-secondary/20" : "bg-secondary/10"}`}>
                     <View className="flex-row justify-between items-center mb-2">
                       <Text className="text-secondary font-inter-bold">USSD Payment Code</Text>
-                      <TouchableOpacity onPress={() => copyToClipboard("*182*1*1*001203#")} className="flex-row items-center">
+                      <TouchableOpacity onPress={() => copyToClipboard("*182*8*1*001203#")} className="flex-row items-center">
                         <Copy color="#10B981" size={16} />
                         <Text className="text-secondary font-inter ml-1">Copy</Text>
                       </TouchableOpacity>
                     </View>
-                    <Text className="text-secondary font-inter-bold text-xl">{"*182*1*1*001203#"}</Text>
+                    <Text className="text-secondary font-inter-bold text-xl">{"*182*8*1*001203#"}</Text>
                   </View>
                   
                   <View className={`rounded-2xl p-4 ${isDarkMode ? "bg-accent/20" : "bg-accent/10"}`}>
