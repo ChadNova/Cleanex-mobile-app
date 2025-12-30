@@ -8,8 +8,6 @@ import {
   Switch,
   ScrollView,
   LayoutAnimation,
-  UIManager,
-  Platform
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -20,10 +18,6 @@ import { useAuth } from '@/contexts/AuthProvider';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/components/ToastProvider';
 import { API_CONFIG } from '@/config/config';
-// Enable LayoutAnimation on Android
-if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
-}
 
 
 export default function ProfileScreen() {
