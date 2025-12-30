@@ -9,7 +9,6 @@ import {
   StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { ArrowLeft, Shield, FileText, ExternalLink, Heart, Star, Sparkles } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
