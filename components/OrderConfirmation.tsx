@@ -1,6 +1,7 @@
 // components/OrderConfirmation.tsx
 import React from "react";
-import {SafeAreaView, ScrollView, View, Text, TouchableOpacity } from "react-native";
+import {ScrollView, View, Text, TouchableOpacity } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { ArrowLeft, Copy, CircleCheck as CheckCircle, Sparkles, Star, Heart } from "lucide-react-native";
 import { useTheme } from "@/contexts/ThemeContext";
 import * as Clipboard from "expo-clipboard";

@@ -1,6 +1,5 @@
 import { supabase } from '@/lib/supabase';
 import React, { useState, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '@/contexts/ThemeContext';
 import { View, Text, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -8,7 +7,6 @@ import { router } from 'expo-router';
 import { Shirt, House as HomeIcon, Bell, TrendingUp, Clock, Star, ArrowRight, Sparkles } from 'lucide-react-native';
 import { useToast } from '@/components/ToastProvider';
 import { API_CONFIG } from '@/config/config';
-import { LinearGradient } from 'expo-linear-gradient';
 
 const { width } = Dimensions.get('window');
 
