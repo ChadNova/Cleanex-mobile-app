@@ -37,7 +37,7 @@ export default function OrderForm({ orderForm, setOrderForm }: OrderFormProps) {
 
           const keyboardType = field === "email" ? "email-address" : field === "phone_number" ? "phone-pad" : "default";
           const multiline = field === "address";
-          const numberOfLines = field === "address" ? 3 : undefined;
+          const numberOfLines = field === "address" ? 3: undefined;
 
           return (
             <View key={field}>
@@ -49,7 +49,7 @@ export default function OrderForm({ orderForm, setOrderForm }: OrderFormProps) {
                 value={orderForm[field as keyof typeof orderForm]}
                 onChangeText={(text) => setOrderForm(prev => ({ ...prev, [field]: text }))}
                 placeholder={`Enter your ${label.toLowerCase()}`}
-                placeholderTextColor={isDarkMode ? "#9CA3AF" : "#6B7280"}
+                placeholderTextColor={isDarkMode? "#9CA3AF" : "#6B7280"}
                 keyboardType={keyboardType}
                 multiline={multiline}
                 numberOfLines={numberOfLines}
