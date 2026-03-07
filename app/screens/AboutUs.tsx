@@ -66,7 +66,7 @@ export default function AboutUsScreen() {
               style={styles.aboutLogo}
             />
             <Text className={`font-inter text-center leading-6 ${isDarkMode ? 'text-gray-300' : 'text-text-secondary'}`}>
-              We wash it all: Clothes, Shoes, Dishes & Home
+              We wash it all: Clothes, Shoes, Dishes, and Home!
             </Text>
           </View>
 
