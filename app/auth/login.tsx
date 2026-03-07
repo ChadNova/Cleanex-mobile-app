@@ -127,7 +127,7 @@ export default function LoginScreen() {
                     <Lock size={32} color="#6366f1" />
                   </View>
                   <Text style={styles.stepTitle}>Sign In to Your Account</Text>
-                  <Text style={styles.stepSubtitle}>Continue your laundry service experience</Text>
+                  <Text style={styles.stepSubtitle}>Sign in to continue your laundry service experience</Text>
                 </View>
 
                 <Formik
