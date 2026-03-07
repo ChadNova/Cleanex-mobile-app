@@ -121,7 +121,7 @@ export function AuthProvider({ children }: Props) {
 function LoadingScreen() {
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Loading session...</Text>
+      <Text>Loading Session...</Text>
     </View>
   );
 }
