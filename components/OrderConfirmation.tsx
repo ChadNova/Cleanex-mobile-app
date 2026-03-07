@@ -184,7 +184,7 @@ export default function OrderConfirmation({ order, onBack }: OrderConfirmationPr
                 Order Confirmed! 🎉
               </Text>
               <Text className={`font-inter text-center text-lg leading-7 ${isDarkMode ? "text-gray-300" : "text-text-secondary"}`}>
-                Your order has been submitted successfully.{"\n"}We'll get started right away!
+                Your order has been submitted successfully. {"\n"}We'll get started right away!
               </Text>
             </View>
 
